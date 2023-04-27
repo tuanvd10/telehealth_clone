@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+//? symbol meaning not required
+
+model Account {
+    id                      Int @id @default(autoincrement())
+    username                String @unique
+    password                String
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @default(now())
+
+    //@@map("accounts") //name of table in database (accounts, not account)
+    //ralationship
+    notes                   Note[] //1 user have many note
+    sessions                AccountSession[] //1 acocunt can login more
+}
+
+model AccountSession {
+    id                      Int @id @default(autoincrement())
+    access_token            String
+
+    //relationship with Account table
+    accountId               Int
+    account                 Account @relation(fields: [accountId], references: [id])
+
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @default(now())
+}
+
+model Note {
+    id                      Int @id @default(autoincrement())
+    title                   String
+    description             String? //can be null
+    url                     String? //can be null
+
+    //relationship with Account table
+    accountId               Int
+    account                 Account @relation(fields: [accountId], references: [id])
+
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @default(now())
+}
