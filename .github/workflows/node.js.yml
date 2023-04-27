@@ -43,15 +43,11 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
       - name: Install dependencies
         run: npm install
-
       - name: Build
         run: npm build
-
       - name: Login
         run: npx warp login --api-key=${SD_API_KEY}
-
       - name: Deploy
         run: npx warp deploy --project ${ORG_PROJECT} --env ${DEPLOY_ENV}
