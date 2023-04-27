@@ -17,7 +17,7 @@ jobs:
       # replace with your project/env name
       ORG_PROJECT: server
       DEPLOY_ENV: dev
-      SD_API_KEY: 6LBsnpngCdF51gQ2MAwVhv
+      SD_API_KEY: 0zlMPoUH4V0xZxWQuaJ125
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
