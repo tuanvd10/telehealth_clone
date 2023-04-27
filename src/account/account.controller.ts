@@ -1,7 +1,7 @@
 import { Controller, Get, Req, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request } from "express";
-import { createSuccessHttpResonse } from "src/common/HttpResponse";
+import { createSuccessHttpResonse } from "../common/HttpResponse";
 
 @Controller("account")
 @UseGuards(AuthGuard("jwt")) //need guard to check token
