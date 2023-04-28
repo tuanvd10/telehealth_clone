@@ -7,6 +7,6 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 	//add middleware to using class validator
 	app.useGlobalPipes(new TrimPipe(), new ValidationPipe());
-	await app.listen(3000);
+	await app.listen(process.env.PORT || 3000, "0.0.0.0");
 }
 bootstrap();
