@@ -3,7 +3,8 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { AuthDTO } from "./dto";
 import { JwtService } from "@nestjs/jwt";
 
-import * as argon from "argon2"; //using to hash password, like passwordhash
+//import * as argon from "argon2"; //using to hash password, like passwordhash
+import * as passwordHash from "password-hash";
 import { ConfigService } from "@nestjs/config";
 import { createSuccessHttpResonse } from "../common/HttpResponse";
 @Injectable()
@@ -16,7 +17,10 @@ export class AuthService {
 
 	async register(authDto: AuthDTO) {
 		//throw new Error("Method not implemented.");
-		const hashPw = await argon.hash(authDto.password);
+		//const hashPw = await argon.hash(authDto.password);
+		const hashPw = passwordHash.generate(authDto.password, {
+			algorithm: "sha256",
+		});
 		//insert into database
 		try {
 			const account = await this.prismaService.account.create({
@@ -43,7 +47,8 @@ export class AuthService {
 			where: { username: authDto.username },
 		});
 		if (!user) throw new ForbiddenException("User or pw not correct");
-		else if (!(await argon.verify(user.password, authDto.password)))
+		//else if (!(await argon.verify(user.password, authDto.password)))
+		else if (!passwordHash.verify(authDto.password, user.password))
 			throw new ForbiddenException("User or pw not correct");
 		delete user.password; //remove file in object, not affect to DB
 		const jwtToken = await this.signJwtToken({
