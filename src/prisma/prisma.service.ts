@@ -10,10 +10,10 @@ export class PrismaService extends PrismaClient {
 		super({
 			datasources: {
 				db: {
-					//url: "mysql://root:Conandoyle!3@localhost:3306/teleheath_clone?schema=public",
 					url: config.get("DATABASE_URL"),
 				},
 			},
+			log: ["query", "info", "warn", "error"],
 		});
 	}
 }

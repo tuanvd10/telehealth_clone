@@ -18,7 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "db:migrate": "echo migrate | npx prisma migrate dev"
+    "db:migrate": "echo migrate | npx prisma migrate dev",
+    "swagger:generate": "npx nest generate resource"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
@@ -27,6 +28,7 @@
     "@nestjs/jwt": "^10.0.3",
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/swagger": "^6.3.0",
     "@prisma/client": "^4.13.0",
     "@types/passport-jwt": "^3.0.8",
     "argon2": "^0.30.3",
@@ -36,7 +38,8 @@
     "passport-jwt": "^4.0.1",
     "prisma": "^4.13.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "swagger-ui-express": "^4.6.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

@@ -7,6 +7,7 @@ import { AccountSessionModule } from "./account-session/account-session.module";
 import { NoteModule } from "./note/note.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { ConfigModule } from "@nestjs/config"; //read data from .env file automatically
+import { SwaggerModule } from "./swagger/swagger.module";
 
 @Module({
 	imports: [
@@ -16,6 +17,7 @@ import { ConfigModule } from "@nestjs/config"; //read data from .env file automa
 		AccountSessionModule,
 		NoteModule,
 		PrismaModule,
+		SwaggerModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
