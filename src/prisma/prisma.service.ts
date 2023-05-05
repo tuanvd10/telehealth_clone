@@ -16,4 +16,8 @@ export class PrismaService extends PrismaClient {
 			log: ["query", "info", "warn", "error"],
 		});
 	}
+	cleanDatabase() {
+		//using transaction
+		return this.$transaction([this.note.deleteMany(), this.accountSession.deleteMany(), this.account.deleteMany()]);
+	}
 }

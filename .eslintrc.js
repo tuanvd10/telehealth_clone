@@ -22,8 +22,8 @@ module.exports = {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-empty-function': 'off',
-        "prettier/prettier": ["error", { "singleQuote": false }],
+        "prettier/prettier": ["error", { "singleQuote": false, 'endOfLine': 'auto' }],
         "indent": [0, "tab"],
-        'prettier/prettier': ['error', { 'endOfLine': 'auto', }],
+        'max-len': ["error", { "code": 120, "ignoreComments": true, "ignoreUrls": true }]
     },
 };

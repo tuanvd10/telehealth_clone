@@ -2,7 +2,7 @@ import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
 
 import { LoggerMiddleware } from "./middlewares";
 
-import { AuthModule } from "src/auth/auth.module";
+import { AuthModule } from "./auth/auth.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AccountModule } from "./account/account.module";
@@ -13,15 +13,7 @@ import { ConfigModule } from "@nestjs/config"; //read data from .env file automa
 import { SwaggerModule } from "./swagger/swagger.module";
 
 @Module({
-	imports: [
-		ConfigModule,
-		AuthModule,
-		AccountModule,
-		AccountSessionModule,
-		NoteModule,
-		PrismaModule,
-		SwaggerModule,
-	],
+	imports: [ConfigModule, AuthModule, AccountModule, AccountSessionModule, NoteModule, PrismaModule, SwaggerModule],
 	controllers: [AppController],
 	providers: [AppService],
 })

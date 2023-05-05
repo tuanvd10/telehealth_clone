@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 import { AuthDTO } from "./dto";
 import { JwtService } from "@nestjs/jwt";
 
@@ -36,8 +36,7 @@ export class AuthService {
 			});
 			return account;
 		} catch (error) {
-			if (error.code === "P2002")
-				throw new ForbiddenException("Error when credentials");
+			if (error.code === "P2002") throw new ForbiddenException("Error when credentials");
 			else throw new ForbiddenException("Unknow error");
 		}
 	}
