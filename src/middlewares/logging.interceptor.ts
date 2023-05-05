@@ -1,12 +1,11 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, RequestTimeoutException } from "@nestjs/common";
 import { Observable, TimeoutError } from "rxjs";
 import { catchError, map, tap, timeout } from "rxjs/operators";
-import { createSuccessHttpResonse } from "../common/HttpResponse";
+import { createSuccessHttpResonse, formatTime } from "../utils";
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
 	intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-		console.log("");
 		const request = context.switchToHttp().getRequest();
 		const now = Date.now();
 		const { ip, method, path: url } = request;
@@ -24,7 +23,7 @@ export class LoggingInterceptor implements NestInterceptor {
 				const { statusCode } = response;
 				const diff = Date.now() - now;
 				console.log(
-					`${method} ${url} ${statusCode} ${diff}ms ${userAgent} ${ip} ${JSON.stringify(
+					`${formatTime(now)} ${method} ${url} ${statusCode} ${diff}ms ${userAgent} ${ip} ${JSON.stringify(
 						params
 					)} ${JSON.stringify(dataResponse)}`
 				);
