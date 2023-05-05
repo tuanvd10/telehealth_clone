@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InsertNoteDTO, UpdateNoteDTO } from "./dto";
-import { PrismaService } from "../prisma/prisma.service";
+import { PrismaService } from "../../prisma/prisma.service";
 
 @Injectable()
 //@Global() //can inject any where

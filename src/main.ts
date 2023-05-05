@@ -7,7 +7,7 @@ import { AllExceptionsFilter } from "./utils";
 import { LoggingInterceptor } from "./middlewares";
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule, {});
 	// request handler sequence: Middleware -> Interceptors -> Pipes -> Route Handler -> Interceptors
 	app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
 	//add middleware to using class validator

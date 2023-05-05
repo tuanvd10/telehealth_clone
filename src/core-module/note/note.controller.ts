@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from "@nestjs/common";
-import { MyJwtGuard } from "../guard";
+import { AuthorizationGuard, MyJwtGuard } from "../../guard";
 import { NoteService } from "./note.service";
-import { CurrentAccount } from "../auth/decorators";
+import { CurrentAccount } from "../../auth/decorators";
 import { InsertNoteDTO, UpdateNoteDTO } from "./dto";
 
-@UseGuards(MyJwtGuard)
+@UseGuards(AuthorizationGuard)
 @Controller("notes")
 export class NoteController {
 	constructor(private noteService: NoteService) {}
