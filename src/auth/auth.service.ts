@@ -6,7 +6,6 @@ import { JwtService } from "@nestjs/jwt";
 //import * as argon from "argon2"; //using to hash password, like passwordhash
 import * as passwordHash from "password-hash";
 import { ConfigService } from "@nestjs/config";
-import { createSuccessHttpResonse } from "../common/HttpResponse";
 @Injectable()
 export class AuthService {
 	constructor(
@@ -35,7 +34,7 @@ export class AuthService {
 					createdAt: true,
 				},
 			});
-			return createSuccessHttpResonse(account);
+			return account;
 		} catch (error) {
 			if (error.code === "P2002")
 				throw new ForbiddenException("Error when credentials");
@@ -55,9 +54,7 @@ export class AuthService {
 			id: user.id,
 			createdAt: user.createdAt,
 		});
-		return createSuccessHttpResonse({
-			token: jwtToken,
-		});
+		return { token: jwtToken };
 	}
 	logout() {
 		throw new Error("Method not implemented.");

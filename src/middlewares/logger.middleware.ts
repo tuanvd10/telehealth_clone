@@ -9,11 +9,7 @@ export class LoggerMiddleware implements NestMiddleware {
 		const userAgent = request.get("user-agent") || "";
 		response.on("finish", () => {
 			const { statusCode } = response;
-			console.log(
-				`${method} ${url} ${statusCode} - ${userAgent} ${ip} ${JSON.stringify(
-					params
-				)}`
-			);
+			//console.log(`${method} ${url} ${statusCode} - ${userAgent} ${ip} ${JSON.stringify(params)}`);
 			//response not include data return here
 		});
 

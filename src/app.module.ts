@@ -27,6 +27,7 @@ import { SwaggerModule } from "./swagger/swagger.module";
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
+		//register middleware
 		consumer.apply(LoggerMiddleware).forRoutes("*");
 	}
 }
