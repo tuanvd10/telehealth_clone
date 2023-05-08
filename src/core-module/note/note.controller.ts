@@ -11,13 +11,13 @@ import {
 	Post,
 	UseGuards,
 } from "@nestjs/common";
-import { MyJwtGuard, RolesGuard } from "../../guard";
+import { MyJwtGuard, RolesGuard, PermissionsGuard } from "../../guard";
 import { NoteService } from "./note.service";
-import { CurrentAccount, Roles } from "../../auth/decorators";
+import { CurrentAccount, RequirePermissions, Roles } from "../../auth/decorators";
 import { InsertNoteDTO, UpdateNoteDTO } from "./dto";
-import { Role } from "../../utils";
+import { Permission, Role } from "../../utils";
 
-@UseGuards(MyJwtGuard, RolesGuard)
+@UseGuards(MyJwtGuard, RolesGuard, PermissionsGuard)
 //@UseGuards(RolesGuard)
 @Controller("notes")
 export class NoteController {
@@ -27,23 +27,26 @@ export class NoteController {
 	getAllNoteOfCurrentUser(@CurrentAccount("id") userId: number) {
 		return this.noteService.getAllNoteOfCurrentUser(userId);
 	}
-	@Roles(Role.Admin, Role.Test)
 	@Get("/v0/:id/detail")
 	getDetailNoteById(@CurrentAccount("id") userId: number, @Param("id", ParseIntPipe) noteId: number) {
-		throw new HttpException("testt", HttpStatus.BAD_REQUEST);
+		//throw new HttpException("testt", HttpStatus.BAD_REQUEST);
 		return this.noteService.getDetailNoteById(userId, noteId);
 	}
 
 	@Post("/v0/new")
+	@Roles(Role.Admin)
+	@RequirePermissions(Permission.CREATE)
 	insertNewNote(@CurrentAccount("id") userId: number, @Body() noteData: InsertNoteDTO) {
 		return this.noteService.insertNewNote(userId, noteData);
 	}
-
+	@Roles(Role.Admin)
+	@RequirePermissions(Permission.CREATE)
 	@Patch("/v0/:id/update") //edit
 	updateNoteById(@Param("id", ParseIntPipe) noteId: number, @Body() noteData: UpdateNoteDTO) {
 		return this.noteService.updateNoteById(noteId, noteData);
 	}
-
+	@Roles(Role.Admin)
+	@RequirePermissions(Permission.REMOVE)
 	@Delete("/v0/:id/delete")
 	removeNoteById(@CurrentAccount("id") userId: number, @Param("id", ParseIntPipe) noteId: number) {
 		return this.noteService.removeNoteById(userId, noteId);

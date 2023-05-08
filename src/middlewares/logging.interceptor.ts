@@ -3,6 +3,7 @@ import { Observable, TimeoutError } from "rxjs";
 import { catchError, map, tap, timeout } from "rxjs/operators";
 import { createSuccessHttpResonse, formatTime } from "../utils";
 
+// catch any errors thrown by pipes, controllers, or services can be read in the catchError operator of an interceptor.
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
 	intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
