@@ -12,6 +12,18 @@ datasource db {
 }
 //? symbol meaning not required
 
+model AccountRole {
+    @@map("account_role")
+    id                      Int @id @default(autoincrement())
+    name                    String
+    description             String?
+
+    accounts                Account[]
+
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @default(now())
+}
+
 model Account {
     @@map("account")
     id                      Int @id @default(autoincrement())
@@ -20,6 +32,7 @@ model Account {
 
     name                    String?
     phone_number            String?
+    role_id                 Int?
 
     createdAt               DateTime @default(now())
     updatedAt               DateTime @default(now())
@@ -28,6 +41,8 @@ model Account {
     //ralationship
     notes                   Note[] //1 user have many note
     sessions                AccountSession[] //1 acocunt can login more
+
+    role                    AccountRole? @relation(fields: [role_id], references: [id])
 }
 
 model AccountSession {

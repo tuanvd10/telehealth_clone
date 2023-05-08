@@ -1,0 +1,5 @@
+export const ENV_CONSTANT = {
+	JWT_SECRET: "JWT_SECRET",
+	DATABASE_URL: "DATABASE_URL",
+	PORT: "PORT",
+};

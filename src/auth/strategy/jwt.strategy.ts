@@ -13,13 +13,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
 			secretOrKey: configService.get("JWT_SECRET"),
 		});
 	}
+
 	async validate(payload: any) {
 		//payload: data decoded
 		const user = await this.prismaService.account.findUnique({
 			where: { id: payload.id },
+			include: {
+				role: true,
+			},
 		});
 		if (!user) {
-			throw new UnauthorizedException();
+			throw new UnauthorizedException("No user");
 		}
 		delete user.password;
 		return user; //add to request.user = payload

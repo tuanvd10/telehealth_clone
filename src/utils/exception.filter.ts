@@ -9,7 +9,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 		// In certain situations `httpAdapter` might not be available in the
 		// constructor method, thus we should resolve it here.
 		const { httpAdapter } = this.httpAdapterHost;
-		console.log(exception);
+		//console.log("AllExceptionsFilter", exception);
 		const ctx = host.switchToHttp();
 
 		const httpStatus =
@@ -17,7 +17,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
 		const responseBody = {
 			statusCode: httpStatus,
-			message: exception.response?.message || exception.message || "Something wrong",
+			message: exception.response?.message || exception.message || "FAILED",
 			error: exception.response?.error || null,
 			timestamp: new Date().toISOString(),
 			path: httpAdapter.getRequestUrl(ctx.getRequest()),

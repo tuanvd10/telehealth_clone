@@ -9,21 +9,27 @@ export class LoggingInterceptor implements NestInterceptor {
 		const request = context.switchToHttp().getRequest();
 		const now = Date.now();
 		const { ip, method, path: url } = request;
-		const params = { ...request.body, ...request.query };
+		const params = { ...request.body, ...request.query, ...request.params, user: request.user };
 		const userAgent = request.get("user-agent") || "";
+		const timeFormated = formatTime(now);
 		return next.handle().pipe(
 			timeout(10000),
-			catchError((err) => {
-				if (err instanceof TimeoutError) {
+			catchError((error) => {
+				const errCode = error.status;
+				const diff = Date.now() - now;
+				console.log(
+					`${timeFormated} ${method} ${url} ${errCode} ${diff}ms ${userAgent} ${ip} ${JSON.stringify(params)}`
+				);
+				if (error instanceof TimeoutError) {
 					throw new RequestTimeoutException();
-				} else throw err;
+				} else throw error;
 			}),
 			tap((dataResponse: any) => {
 				const response = context.switchToHttp().getResponse();
 				const { statusCode } = response;
 				const diff = Date.now() - now;
 				console.log(
-					`${formatTime(now)} ${method} ${url} ${statusCode} ${diff}ms ${userAgent} ${ip} ${JSON.stringify(
+					`${timeFormated} ${method} ${url} ${statusCode} ${diff}ms ${userAgent} ${ip} ${JSON.stringify(
 						params
 					)} ${JSON.stringify(dataResponse)}`
 				);
