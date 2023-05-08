@@ -1,1 +1,2 @@
-export * from "./TrimPipe";
+export * from "./trim.pipe";
+export * from "./validation.pipe";
