@@ -11,9 +11,19 @@ import { NoteModule } from "./core-module/note/note.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { ConfigModule } from "@nestjs/config"; //read data from .env file automatically
 import { SwaggerModule } from "./swagger/swagger.module";
+import { CacheModule } from "@nestjs/cache-manager";
 
 @Module({
-	imports: [ConfigModule, AuthModule, AccountModule, AccountSessionModule, NoteModule, PrismaModule, SwaggerModule],
+	imports: [
+		ConfigModule,
+		AuthModule,
+		AccountModule,
+		AccountSessionModule,
+		NoteModule,
+		PrismaModule,
+		SwaggerModule,
+		CacheModule.register({ isGlobal: true, ttl: 10000 }), //10 second
+	],
 	controllers: [AppController],
 	providers: [AppService],
 })

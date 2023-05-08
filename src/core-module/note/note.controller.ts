@@ -22,7 +22,7 @@ import { Permission, Role } from "../../utils";
 @Controller("notes")
 export class NoteController {
 	constructor(private noteService: NoteService) {}
-	@Get("v0/all")
+	@Get("/v0/all")
 	@Roles(Role.Admin)
 	getAllNoteOfCurrentUser(@CurrentAccount("id") userId: number) {
 		return this.noteService.getAllNoteOfCurrentUser(userId);
