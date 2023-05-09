@@ -1,6 +1,9 @@
 import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
 import { CacheModule, CacheStore } from "@nestjs/cache-manager";
 import { redisStore } from "cache-manager-redis-store";
+import { ScheduleModule } from "@nestjs/schedule";
+//import { RedisClientOptions } from "redis";
+import { ConfigModule, ConfigService } from "@nestjs/config"; //read data from .env file automatically
 
 import { LoggerMiddleware } from "./middlewares";
 import { AuthModule } from "./auth/auth.module";
@@ -10,9 +13,8 @@ import { AccountModule } from "./core-module/account/account.module";
 import { AccountSessionModule } from "./core-module/account-session/account-session.module";
 import { NoteModule } from "./core-module/note/note.module";
 import { PrismaModule } from "./prisma/prisma.module";
-import { ConfigModule, ConfigService } from "@nestjs/config"; //read data from .env file automatically
 import { SwaggerModule } from "./swagger/swagger.module";
-//import { RedisClientOptions } from "redis";
+import { TaskScheduleModule } from "./task-schedule/task-schedule.module";
 
 //console.log(process.env);
 
@@ -43,6 +45,8 @@ import { SwaggerModule } from "./swagger/swagger.module";
 			}),
 			inject: [ConfigService],
 		}),
+		ScheduleModule.forRoot(),
+		TaskScheduleModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
