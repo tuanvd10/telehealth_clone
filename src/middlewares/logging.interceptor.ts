@@ -1,11 +1,21 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, RequestTimeoutException } from "@nestjs/common";
+import {
+	Injectable,
+	NestInterceptor,
+	ExecutionContext,
+	CallHandler,
+	RequestTimeoutException,
+	LoggerService,
+	Inject,
+} from "@nestjs/common";
 import { Observable, TimeoutError } from "rxjs";
 import { catchError, map, tap, timeout } from "rxjs/operators";
 import { createSuccessHttpResonse, formatTime } from "../utils";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 // catch any errors thrown by pipes, controllers, or services can be read in the catchError operator of an interceptor.
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
+	constructor(@Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService) {}
 	intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
 		const request = context.switchToHttp().getRequest();
 		const now = Date.now();
@@ -18,8 +28,11 @@ export class LoggingInterceptor implements NestInterceptor {
 			catchError((error) => {
 				const errCode = error.status;
 				const diff = Date.now() - now;
-				console.log(
-					`${timeFormated} ${method} ${url} ${errCode} ${diff}ms ${userAgent} ${ip} ${JSON.stringify(params)}`
+				this.logger.error(
+					`${timeFormated} ${method} ${url} ${errCode} ${diff}ms ${userAgent} ${ip} ${JSON.stringify(
+						params
+					)}`,
+					error
 				);
 				if (error instanceof TimeoutError) {
 					throw new RequestTimeoutException();
@@ -29,10 +42,12 @@ export class LoggingInterceptor implements NestInterceptor {
 				const response = context.switchToHttp().getResponse();
 				const { statusCode } = response;
 				const diff = Date.now() - now;
-				console.log(
+				//console.log(dataResponse);
+				this.logger.log(
 					`${timeFormated} ${method} ${url} ${statusCode} ${diff}ms ${userAgent} ${ip} ${JSON.stringify(
 						params
-					)} ${JSON.stringify(dataResponse)}`
+					)}`,
+					dataResponse
 				);
 			}),
 			map((data: any) => createSuccessHttpResonse(data))

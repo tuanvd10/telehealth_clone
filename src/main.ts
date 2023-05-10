@@ -1,18 +1,17 @@
-import { HttpAdapterHost, NestFactory } from "@nestjs/core";
+import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { TrimPipe } from "./pipes";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { AllExceptionsFilter } from "./utils";
-import { LoggingInterceptor } from "./middlewares";
 import { ValidationPipe } from "@nestjs/common";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {});
 	// request handler sequence: Middleware/Guard-> Interceptors -> Pipes -> Route Handler -> Interceptors
-	app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
+	//app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
 	//add middleware to using class validator
 	app.useGlobalPipes(new TrimPipe(), new ValidationPipe());
-	app.useGlobalInterceptors(new LoggingInterceptor());
+	app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 	const config = new DocumentBuilder()
 		.setTitle("Median")
 		.setDescription("The Median API description")

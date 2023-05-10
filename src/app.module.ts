@@ -1,11 +1,14 @@
-import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
+import { Module, NestModule, MiddlewareConsumer, Logger } from "@nestjs/common";
 import { CacheModule, CacheStore } from "@nestjs/cache-manager";
 import { redisStore } from "cache-manager-redis-store";
 import { ScheduleModule } from "@nestjs/schedule";
 //import { RedisClientOptions } from "redis";
 import { ConfigModule, ConfigService } from "@nestjs/config"; //read data from .env file automatically
+import { WinstonModule } from "nest-winston";
+import * as winston from "winston";
+import * as winstonDailyRotateFile from "winston-daily-rotate-file";
 
-import { LoggerMiddleware } from "./middlewares";
+import { LoggerMiddleware, LoggingInterceptor } from "./middlewares";
 import { AuthModule } from "./auth/auth.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -15,12 +18,64 @@ import { NoteModule } from "./core-module/note/note.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SwaggerModule } from "./swagger/swagger.module";
 import { TaskScheduleModule } from "./task-schedule/task-schedule.module";
+import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
+import { AllExceptionsFilter } from "./utils";
 
-//console.log(process.env);
+const winstonPrintFunction = ({ level, context, timestamp, message, stack, trace }) => {
+	let text: any; // = info.context || (info.stack && info.stack[0]) || "";
+	if (level.includes("error")) {
+		text = (stack && stack[0]) || trace;
+		if (text instanceof Error) {
+			//console.log(text);
+			text = text.stack;
+		}
+	} else {
+		text = context;
+	}
+	//console.log(level, text);
+	return `[${timestamp}] [${level}] ${message} ${JSON.stringify(text)}`;
+};
+
+const winstonTransports = {
+	console: new winston.transports.Console({
+		level: "debug",
+		format: winston.format.combine(
+			winston.format.errors({ stack: true }), // <-- use errors format
+			winston.format.colorize({
+				colors: {
+					error: "red",
+					warn: "yellow",
+					info: "green",
+					debug: "blue",
+				},
+			}),
+			winston.format.timestamp({
+				format: "YYYY-MM-DD HH:mm:ss",
+			}),
+			winston.format.printf(winstonPrintFunction)
+			//winston.format.align()
+		),
+	}),
+	combinedFile: (logLevel: "debug" | "info" | "error") =>
+		new winstonDailyRotateFile({
+			dirname: "logs",
+			filename: "combined",
+			extension: ".log",
+			level: logLevel,
+			maxFiles: "30d", //30 day
+			maxSize: "30m",
+		}),
+	errorFile: new winstonDailyRotateFile({
+		dirname: "logs",
+		filename: "error",
+		extension: ".log",
+		level: "error",
+	}),
+};
 
 @Module({
 	imports: [
-		ConfigModule,
+		ConfigModule.forRoot({ isGlobal: true }),
 		AuthModule,
 		AccountModule,
 		AccountSessionModule,
@@ -45,11 +100,38 @@ import { TaskScheduleModule } from "./task-schedule/task-schedule.module";
 			}),
 			inject: [ConfigService],
 		}),
+		WinstonModule.forRootAsync({
+			imports: [ConfigModule],
+			useFactory: (configService: ConfigService) => ({
+				// options
+				exitOnError: false,
+				format: winston.format.combine(
+					winston.format.errors({ stack: true }), // <-- use errors format
+					winston.format.timestamp({
+						format: "YYYY-MM-DD HH:mm:ss",
+					}),
+					winston.format.printf(winstonPrintFunction)
+					//winston.format.align()
+				),
+				transports: [winstonTransports.console, winstonTransports.combinedFile(configService.get("LOG_LEVEL"))],
+			}),
+			inject: [ConfigService],
+		}),
 		ScheduleModule.forRoot(),
 		TaskScheduleModule,
 	],
 	controllers: [AppController],
-	providers: [AppService],
+	providers: [
+		AppService,
+		{
+			provide: APP_INTERCEPTOR,
+			useClass: LoggingInterceptor,
+		},
+		{
+			provide: APP_FILTER,
+			useClass: AllExceptionsFilter,
+		},
+	],
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {

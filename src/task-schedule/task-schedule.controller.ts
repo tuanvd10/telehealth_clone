@@ -4,7 +4,7 @@ import { TaskScheduleService } from "./task-schedule.service";
 import { Role } from "src/utils";
 import { Roles } from "src/auth/decorators";
 
-@UseGuards(MyJwtGuard, RolesGuard, PermissionsGuard)
+//@UseGuards(MyJwtGuard, RolesGuard, PermissionsGuard)
 @Controller("task-schedule")
 export class TaskScheduleController {
 	constructor(private taskScheduleService: TaskScheduleService) {}

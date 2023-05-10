@@ -1,10 +1,14 @@
-import { Injectable } from "@nestjs/common";
-import { Cron, CronExpression, SchedulerRegistry } from "@nestjs/schedule";
+import { Inject, Injectable, LoggerService } from "@nestjs/common";
+import { SchedulerRegistry } from "@nestjs/schedule";
 import { CronJob } from "cron";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 @Injectable()
 export class TaskScheduleService {
-	constructor(private schedulerRegistry: SchedulerRegistry) {}
+	constructor(
+		private schedulerRegistry: SchedulerRegistry,
+		@Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService
+	) {}
 	//Traditional define
 	/* @Cron(CronExpression.EVERY_30_SECONDS, { name: "call_ervery_30_seconds" })
 	handleCronEvery30Second() {
@@ -28,7 +32,7 @@ export class TaskScheduleService {
 		const isExist = this.schedulerRegistry.doesExist("cron", name);
 		if (isExist) return `job- ${name} exist`;
 		const job = new CronJob(`${time}`, () => {
-			console.log(`time (${time}) for job ${name} to run!`);
+			this.logger.log(`time (${time}) for job ${name} to run!`);
 		});
 		this.schedulerRegistry.addCronJob(name, job);
 		job.start();
@@ -51,6 +55,7 @@ export class TaskScheduleService {
 			}
 			data.push(`job: ${key} -> next: ${next}`);
 		});
+		this.logger.log(`data`, data);
 		return data;
 	}
 
@@ -59,7 +64,7 @@ export class TaskScheduleService {
 		const isExist = this.schedulerRegistry.doesExist("interval", name);
 		if (isExist) return `Interval ${name} exist`;
 		const callback = () => {
-			console.log(`Interval ${name} executing every ${milliseconds}ms!`);
+			this.logger.log(`Interval ${name} executing every ${milliseconds}ms!`);
 		};
 		const interval = setInterval(callback, milliseconds);
 		this.schedulerRegistry.addInterval(name, interval);
