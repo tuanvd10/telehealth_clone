@@ -20,6 +20,7 @@ import { SwaggerModule } from "./swagger/swagger.module";
 import { TaskScheduleModule } from "./task-schedule/task-schedule.module";
 import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { AllExceptionsFilter } from "./utils";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 
 const winstonPrintFunction = ({ level, context, timestamp, message, stack, trace }) => {
 	let text: any; // = info.context || (info.stack && info.stack[0]) || "";
@@ -119,6 +120,16 @@ const winstonTransports = {
 		}),
 		ScheduleModule.forRoot(),
 		TaskScheduleModule,
+		EventEmitterModule.forRoot({
+			global: true,
+			wildcard: false, // set this to `true` to use wildcards
+			delimiter: ".", // the delimiter used to segment namespaces
+			newListener: false, // set this to `true` if you want to emit the newListener event
+			removeListener: false, // set this to `true` if you want to emit the removeListener event
+			maxListeners: 10, // the maximum amount of listeners that can be assigned to an event
+			verboseMemoryLeak: false, // show event name in memory leak message when more than maximum amount of listeners is assigned
+			ignoreErrors: false, // disable throwing uncaughtException if an error event is emitted and it has no listeners
+		}),
 	],
 	controllers: [AppController],
 	providers: [
