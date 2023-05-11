@@ -1,7 +1,6 @@
 import { Inject, Injectable, LoggerService } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
-import { listeners } from "process";
 
 @Injectable()
 export class AppService {

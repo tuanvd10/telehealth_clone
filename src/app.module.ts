@@ -21,6 +21,10 @@ import { TaskScheduleModule } from "./task-schedule/task-schedule.module";
 import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { AllExceptionsFilter } from "./utils";
 import { EventEmitterModule } from "@nestjs/event-emitter";
+import { MulterModule } from "@nestjs/platform-express";
+import multer, { diskStorage } from "multer";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
 
 const winstonPrintFunction = ({ level, context, timestamp, message, stack, trace }) => {
 	let text: any; // = info.context || (info.stack && info.stack[0]) || "";
@@ -76,6 +80,9 @@ const winstonTransports = {
 
 @Module({
 	imports: [
+		ServeStaticModule.forRoot({
+			rootPath: join(__dirname, "..", "uploads"),
+		}),
 		ConfigModule.forRoot({ isGlobal: true }),
 		AuthModule,
 		AccountModule,
@@ -129,6 +136,11 @@ const winstonTransports = {
 			maxListeners: 10, // the maximum amount of listeners that can be assigned to an event
 			verboseMemoryLeak: false, // show event name in memory leak message when more than maximum amount of listeners is assigned
 			ignoreErrors: false, // disable throwing uncaughtException if an error event is emitted and it has no listeners
+		}),
+		MulterModule.registerAsync({
+			imports: [ConfigModule],
+			useFactory: async (configService: ConfigService) => ({}),
+			inject: [ConfigService],
 		}),
 	],
 	controllers: [AppController],

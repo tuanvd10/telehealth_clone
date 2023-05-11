@@ -2,23 +2,35 @@ import {
 	Body,
 	Controller,
 	Delete,
+	FileTypeValidator,
 	Get,
 	HttpException,
 	HttpStatus,
+	MaxFileSizeValidator,
 	Param,
+	ParseFilePipe,
+	ParseFilePipeBuilder,
 	ParseIntPipe,
 	Patch,
 	Post,
+	UploadedFile,
+	UploadedFiles,
+	UseFilters,
 	UseGuards,
+	UseInterceptors,
 } from "@nestjs/common";
+import { FileFieldsInterceptor, FileInterceptor } from "@nestjs/platform-express";
+
+import { mkdirSync } from "fs";
+
 import { MyJwtGuard, RolesGuard, PermissionsGuard } from "../../guard";
 import { NoteService } from "./note.service";
 import { CurrentAccount, RequirePermissions, Roles } from "../../auth/decorators";
 import { InsertNoteDTO, UpdateNoteDTO } from "./dto";
 import { Permission, Role } from "../../utils";
+import { diskStorage } from "multer";
 
 @UseGuards(MyJwtGuard, RolesGuard, PermissionsGuard)
-//@UseGuards(RolesGuard)
 @Controller("notes")
 export class NoteController {
 	constructor(private noteService: NoteService) {}
@@ -50,5 +62,59 @@ export class NoteController {
 	@Delete("/v0/:id/delete")
 	removeNoteById(@CurrentAccount("id") userId: number, @Param("id", ParseIntPipe) noteId: number) {
 		return this.noteService.removeNoteById(userId, noteId);
+	}
+
+	@Post("upload")
+	@UseInterceptors(
+		FileInterceptor("document", {
+			dest: "./upload/note/",
+			storage: diskStorage({
+				destination: function (req, file, cb) {
+					const dest = `./uploads/note/${req.user["id"]}`;
+					mkdirSync(dest, { recursive: true });
+					//create folder if not exist
+					cb(null, dest);
+				},
+				filename: function (req, file, callback) {
+					const filenames = file.originalname.split(".");
+					const newFileName = filenames[0] + new Date().getTime() + "." + filenames[1];
+					callback(null, newFileName);
+				},
+			}),
+		})
+	)
+	//@UseFilters(DeleteFileOnErrorFilter)
+	uploadFile(
+		@UploadedFile(
+			new ParseFilePipeBuilder()
+				.addFileTypeValidator({
+					fileType: new RegExp(
+						"/^(application/vnd.openxmlformats-officedocument.wordprocessingml.document | image/jpeg)$/"
+					), //using mimetype
+				})
+				.addMaxSizeValidator({ maxSize: 1000 * 1000 }) //as byte
+				.build({
+					errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+				})
+		)
+		fieldData: Express.Multer.File,
+		@Body() data: any
+	) {
+		console.log(fieldData);
+		console.log(data);
+		throw new Error("dfhgkfdhgkjfdghkdjf");
+		return "Upload success";
+	}
+
+	@Post("upload/multi")
+	@UseInterceptors(
+		FileFieldsInterceptor([
+			{ name: "avatar", maxCount: 1 },
+			{ name: "background", maxCount: 1 },
+		])
+	)
+	uploadFileMulti(@UploadedFiles() files: { avatar?: Express.Multer.File[]; background?: Express.Multer.File[] }) {
+		console.log(files);
+		return "Upload success";
 	}
 }
